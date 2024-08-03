@@ -226,3 +226,46 @@ def test_user_creation_without_email():
             password="testpassword",
             username="noemail",
         )
+
+
+@pytest.mark.django_db
+def test_create_superuser():
+    """
+    Test creating a superuser.
+    """
+    superuser = User.objects.create_superuser(
+        email="admin@example.com", password="adminpassword"
+    )
+    # Check if the superuser is created correctly
+    assert superuser.email == "admin@example.com"
+    assert superuser.is_staff
+    assert superuser.is_superuser
+    # Check if a profile is automatically created for the superuser
+    assert hasattr(superuser, "profile")
+    assert isinstance(superuser.profile, Profile)
+
+    # Test creating a superuser with custom fields
+    custom_superuser = User.objects.create_superuser(
+        email="custom_admin@example.com",
+        password="adminpassword",
+        full_name="Custom Admin",
+    )
+    assert custom_superuser.email == "custom_admin@example.com"
+    assert custom_superuser.is_staff
+    assert custom_superuser.is_superuser
+    assert custom_superuser.full_name == "Custom Admin"
+
+    # Test that is_staff and is_superuser can't be set to False
+    with pytest.raises(ValueError):
+        User.objects.create_superuser(
+            email="fail_admin@example.com",
+            password="adminpassword",
+            is_staff=False,
+        )
+
+    with pytest.raises(ValueError):
+        User.objects.create_superuser(
+            email="fail_admin@example.com",
+            password="adminpassword",
+            is_superuser=False,
+        )
