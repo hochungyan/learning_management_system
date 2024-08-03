@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/hochungyan/learning_management_system/branch/main/graph/badge.svg)](https://codecov.io/gh/hochungyan/learning_management_system)
+![CodeQL and Coverage](https://github.com/hochungyan/learning_management_system/actions/workflows/codeql-analysis.yml/badge.svg)
 # Learning Management System
 
 This project is a comprehensive, advanced full-stack Learning Management System (LMS) built from scratch using Django for the backend and React for the frontend. The system is designed to provide essential features for both learners and instructors, facilitating a dynamic and interactive online learning experience.
