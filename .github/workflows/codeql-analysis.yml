@@ -19,14 +19,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'python' ]  # Add other languages if needed
+        language: [ 'python' ]
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
@@ -36,15 +36,22 @@ jobs:
         pip install -r requirements.txt
         pip install -r backend/requirements.txt
 
+    - name: Create .coveragerc
+      run: |
+        echo "[run]" > .coveragerc
+        echo "source = backend" >> .coveragerc
+        echo "omit = */migrations/*, */tests/*" >> .coveragerc
+
     - name: Run tests with coverage
       run: |
+        cd backend
         coverage run -m pytest
         coverage xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
-        file: coverage.xml
+        file: backend/coverage.xml
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
