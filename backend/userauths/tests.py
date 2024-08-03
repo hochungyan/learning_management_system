@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 @pytest.mark.django_db
 def test_user_creation_without_username():
     """
@@ -14,10 +15,13 @@ def test_user_creation_without_username():
     Returns:
         None
     """
-    user = User.objects.create_user(email='test@example.com', password='testpassword')
-    assert user.email == 'test@example.com'
-    assert user.username == 'test'
-    assert user.full_name == 'test'
+    user = User.objects.create_user(
+        email="test@example.com", password="testpassword"
+    )
+    assert user.email == "test@example.com"
+    assert user.username == "test"
+    assert user.full_name == "test"
+
 
 @pytest.mark.django_db
 def test_user_creation_with_username():
@@ -29,11 +33,16 @@ def test_user_creation_with_username():
 
     Returns:
         None
-    """ 
-    user = User.objects.create_user(email='test@example.com', password='testpassword', username='customuser')
-    assert user.email == 'test@example.com'
-    assert user.username == 'customuser'
-    assert user.full_name == 'customuser'
+    """
+    user = User.objects.create_user(
+        email="test@example.com",
+        password="testpassword",
+        username="customuser",
+    )
+    assert user.email == "test@example.com"
+    assert user.username == "customuser"
+    assert user.full_name == "customuser"
+
 
 @pytest.mark.django_db
 def test_user_creation_with_all_fields():
@@ -46,10 +55,16 @@ def test_user_creation_with_all_fields():
     Returns:
         None
     """
-    user = User.objects.create_user(email='full@example.com', password='testpassword', username='fulluser', full_name='Full User')
-    assert user.email == 'full@example.com'
-    assert user.username == 'fulluser'
-    assert user.full_name == 'Full User'
+    user = User.objects.create_user(
+        email="full@example.com",
+        password="testpassword",
+        username="fulluser",
+        full_name="Full User",
+    )
+    assert user.email == "full@example.com"
+    assert user.username == "fulluser"
+    assert user.full_name == "Full User"
+
 
 @pytest.mark.django_db
 def test_user_creation_without_email():
@@ -65,5 +80,10 @@ def test_user_creation_without_email():
     Raises:
         ValueError: If the email field is not set.
     """
-    with pytest.raises(ValueError, match='The Email field must be set'):
-        User.objects.create_user(email='', password='testpassword', username='fulluser', full_name='Full User')
+    with pytest.raises(ValueError, match="The Email field must be set"):
+        User.objects.create_user(
+            email="",
+            password="testpassword",
+            username="fulluser",
+            full_name="Full User",
+        )
