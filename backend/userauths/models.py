@@ -58,7 +58,7 @@ class Profile(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.full_name if self.full_name else self.user.username
+        return self.full_name or self.user.username
 
     def save(self, *args, **kwargs):
         if not self.full_name:
@@ -70,7 +70,6 @@ class Profile(models.Model):
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance, full_name=instance.full_name)
-    else:
-        if hasattr(instance, "profile"):
-            instance.profile.full_name = instance.full_name
-            instance.profile.save()
+    elif hasattr(instance, "profile"):
+        instance.profile.full_name = instance.full_name
+        instance.profile.save()
