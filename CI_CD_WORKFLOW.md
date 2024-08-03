@@ -1,32 +1,34 @@
-# CI/CD Workflow
-
-## Overview
+CI/CD Workflow
+Overview
 This project employs a comprehensive CI/CD pipeline using GitHub Actions. The pipeline includes the following stages:
+Setup
 
-### Setup
-- Checkout code
-- Set up Python environment
-- Install dependencies
+Checkout code
+Set up Python environment
+Install dependencies
 
-### Code Quality
-- Run linters with `flake8`
-- Execute pre-commit hooks
+Code Quality
 
-### Testing
-- Run tests with `pytest`
-- Generate coverage report with `coverage.py`
-- Upload coverage to Codecov
+Run linters with flake8
+Execute pre-commit hooks
+Perform Sourcery code quality check
 
-### Security Analysis
-- Perform CodeQL analysis for security vulnerabilities
+Testing
 
-### Deployment
-- Deploy to production on successful builds
+Run tests with pytest
+Generate coverage report with coverage.py
+Upload coverage to Codecov
 
-## Workflow File
+Security Analysis
 
-```yaml
-name: CI/CD Pipeline
+Perform CodeQL analysis for security vulnerabilities
+
+Deployment
+
+Deploy to production on successful builds from the main branch
+
+Workflow File
+yamlCopyname: CI/CD Pipeline
 
 on:
   push:
@@ -45,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -57,34 +59,52 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r backend/requirements.txt
+          pip install flake8 pre-commit coverage pytest pytest-django pytest-cov sourcery-cli
 
   code_quality:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - name: Install code quality tools
-        run: |
-          pip install flake8 pre-commit
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
       - name: Run linters
-        run: |
-          flake8 .
+        run: flake8 .
 
       - name: Run pre-commit hooks
+        run: pre-commit run --all-files
+
+      - name: Run Sourcery
+        env:
+          SOURCERY_TOKEN: ${{ secrets.SOURCERY_TOKEN }}
         run: |
-          pre-commit run --all-files
+          sourcery login --token $SOURCERY_TOKEN
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            sourcery review --check --diff "origin/${{ github.base_ref }}..HEAD" .
+          else
+            sourcery review --check .
+          fi
 
   tests:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Run tests with coverage
         run: |
           coverage run -m pytest
           coverage xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: coverage.xml
 
@@ -92,6 +112,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
@@ -105,7 +128,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests, code_quality, codeql_analysis]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to Production
