@@ -34,56 +34,56 @@ This project is a comprehensive, advanced full-stack Learning Management System 
 * React
 
 ### Backend Setup
-1. Clone the repository:
-git clone https://github.com/your-username/lms-django-react.git
-2. Navigate to the backend directory:
-cd lms-django-react/backend
-3. Create a virtual environment:
-python -m venv venv
+1. Clone the repository: `git clone https://github.com/your-username/lms-django-react.git`
+2. Navigate to the backend directory: `cd lms-django-react/backend`
+3. Create a virtual environment: `python -m venv venv`
 4. Activate the virtual environment:
-* On Windows:
-  ```
-  venv\Scripts\activate
-  ```
-* On macOS and Linux:
-  ```
-  source venv/bin/activate
-  ```
-5. Install the required packages:
-pip install -r requirements.txt
-Copy6. Run migrations:
-python manage.py migrate
-Copy7. Start the Django development server:
-python manage.py runserver
+   * On Windows: `venv\Scripts\activate`
+   * On macOS and Linux: `source venv/bin/activate`
+5. Install the required packages: `pip install -r requirements.txt`
+6. Run migrations: `python manage.py migrate`
+7. Start the Django development server: `python manage.py runserver`
 
 ### Frontend Setup
-1. Navigate to the frontend directory:
-cd ../frontend
-2. Install the required npm packages:
-npm install
-3. Start the React development server:
-npm start
+1. Navigate to the frontend directory: `cd ../frontend`
+2. Install the required npm packages: `npm install`
+3. Start the React development server: `npm start`
 
 ## Usage
 After starting both the backend and frontend servers, you can access the application at `http://localhost:3000`.
 
 ## CI/CD Workflow
+
 This project uses GitHub Actions for continuous integration and deployment. The CI/CD pipeline includes:
 
-- **Code Quality**: Linting and pre-commit hooks using `flake8` and `pre-commit`.
-- **Testing**: Running tests with `pytest` and generating coverage reports with `coverage.py`.
-- **Security Analysis**: Using CodeQL to identify security vulnerabilities.
-- **Deployment**: Automated deployment to production on successful builds.
+* **Setup**: Checkout code, set up Python environment, and install dependencies
+* **Code Quality**: Linting with `flake8`, pre-commit hooks, and Sourcery analysis
+* **Testing**: Running tests with `pytest` and generating coverage reports with `coverage.py`
+* **Security Analysis**: Using CodeQL to identify security vulnerabilities
+* **Deployment**: Automated deployment to production on successful builds from the main branch
 
-For more details, see the [CI/CD Workflow](CI_CD_WORKFLOW.md).
+The workflow runs on pushes to `main` and `develop` branches, pull requests to these branches, and every Wednesday at 1:00 AM.
+
+### Sourcery Code Quality Check
+
+The workflow includes a Sourcery code quality check. Note that:
+
+- Sourcery primarily analyzes code files, with a focus on Python by default.
+- If your repository only contains non-code files (like README.md), Sourcery may report scanning 0 files.
+- To benefit from Sourcery's analysis, ensure your repository contains the appropriate code files.
+
+For more details on the CI/CD process, please refer to the [CI/CD Workflow documentation](./CI_CD_WORKFLOW.md).
 
 ## Contributing
+
 As this is a personal project, contributions are not currently being accepted. However, feedback and suggestions are always welcome. Feel free to open an issue if you have any ideas or encounter any problems.
 
 ## License
+
 This project is personal work and is not open for licensing or redistribution at this time. All rights reserved. © Chung Ltd 2024
 
 ## Acknowledgments
+
 * Hat tip to anyone whose code was used
 * Inspiration
 * etc
