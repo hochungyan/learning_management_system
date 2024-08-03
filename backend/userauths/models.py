@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
@@ -15,6 +17,12 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
         return self.create_user(email, password, **extra_fields)
 
 
@@ -40,3 +48,34 @@ class User(AbstractUser):
         if not self.full_name:
             self.full_name = self.username
         super().save(*args, **kwargs)
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.FileField(
+        upload_to="user_folder",
+        default="default-user.jpg",
+        null=True,
+        blank=True,
+    )
+    full_name = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    about = models.TextField(null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.full_name or self.user.username
+
+    def save(self, *args, **kwargs):
+        if not self.full_name:
+            self.full_name = self.user.full_name or self.user.username
+        super().save(*args, **kwargs)
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance, full_name=instance.full_name)
+    elif hasattr(instance, "profile"):
+        instance.profile.full_name = instance.full_name
+        instance.profile.save()
