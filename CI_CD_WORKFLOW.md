@@ -1,3 +1,31 @@
+# CI/CD Workflow
+
+## Overview
+This project employs a comprehensive CI/CD pipeline using GitHub Actions. The pipeline includes the following stages:
+
+### Setup
+- Checkout code
+- Set up Python environment
+- Install dependencies
+
+### Code Quality
+- Run linters with `flake8`
+- Execute pre-commit hooks
+
+### Testing
+- Run tests with `pytest`
+- Generate coverage report with `coverage.py`
+- Upload coverage to Codecov
+
+### Security Analysis
+- Perform CodeQL analysis for security vulnerabilities
+
+### Deployment
+- Deploy to production on successful builds
+
+## Workflow File
+
+```yaml
 name: CI/CD Pipeline
 
 on:
@@ -83,6 +111,3 @@ jobs:
       - name: Deploy to Production
         run: echo "Deploying to production..."
         # Add your deployment steps here
-
-
-
