@@ -1,3 +1,31 @@
+# CI/CD Workflow
+
+## Overview
+This project employs a comprehensive CI/CD pipeline using GitHub Actions. The pipeline includes the following stages:
+
+### Setup
+- Checkout code
+- Set up Python environment
+- Install dependencies
+
+### Code Quality
+- Run linters with `flake8`
+- Execute pre-commit hooks
+
+### Testing
+- Run tests with `pytest`
+- Generate coverage report with `coverage.py`
+- Upload coverage to Codecov
+
+### Security Analysis
+- Perform CodeQL analysis for security vulnerabilities
+
+### Deployment
+- Deploy to production on successful builds
+
+## Workflow File
+
+```yaml
 name: CI/CD Pipeline
 
 on:
@@ -17,59 +45,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: '3.10'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r backend/requirements.txt
-          pip install flake8 pre-commit coverage pytest pytest-django pytest-cov
 
   code_quality:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
+      - name: Install code quality tools
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r backend/requirements.txt
           pip install flake8 pre-commit
+
       - name: Run linters
-        run: flake8 .
+        run: |
+          flake8 .
+
       - name: Run pre-commit hooks
-        run: pre-commit run --all-files
+        run: |
+          pre-commit run --all-files
 
   tests:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r backend/requirements.txt
-          pip install coverage pytest pytest-django pytest-cov
       - name: Run tests with coverage
         run: |
           coverage run -m pytest
           coverage xml
+
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v2
         with:
           file: coverage.xml
 
@@ -77,20 +92,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: python
+
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [tests, code_quality, codeql_analysis]
+    needs: tests
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to Production

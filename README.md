@@ -67,6 +67,16 @@ npm start
 ## Usage
 After starting both the backend and frontend servers, you can access the application at `http://localhost:3000`.
 
+## CI/CD Workflow
+This project uses GitHub Actions for continuous integration and deployment. The CI/CD pipeline includes:
+
+- **Code Quality**: Linting and pre-commit hooks using `flake8` and `pre-commit`.
+- **Testing**: Running tests with `pytest` and generating coverage reports with `coverage.py`.
+- **Security Analysis**: Using CodeQL to identify security vulnerabilities.
+- **Deployment**: Automated deployment to production on successful builds.
+
+For more details, see the [CI/CD Workflow](CI_CD_WORKFLOW.md).
+
 ## Contributing
 As this is a personal project, contributions are not currently being accepted. However, feedback and suggestions are always welcome. Feel free to open an issue if you have any ideas or encounter any problems.
 
