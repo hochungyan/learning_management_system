@@ -1,7 +1,9 @@
 import pytest
-from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APIClient
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @pytest.fixture
 def api_client():
@@ -9,7 +11,7 @@ def api_client():
 
 @pytest.fixture
 def admin_user():
-    return User.objects.create_superuser(username='admin', password='test', email='test@example.com')
+    return User.objects.create_superuser(email='admin@example.com', password='test')
 
 @pytest.mark.django_db
 def test_admin_login_redirects_to_login_page(api_client):
@@ -43,7 +45,7 @@ def test_admin_login_successful(api_client, admin_user):
     Raises:
         AssertionError: If the login is not successful.
     """
-    login_successful = api_client.login(username='admin', password='test')
+    login_successful = api_client.login(email='admin@example.com', password='test')
     assert login_successful
 
 @pytest.mark.django_db
