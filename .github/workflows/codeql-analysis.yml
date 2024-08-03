@@ -1,5 +1,4 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches: [main, develop]
@@ -7,11 +6,9 @@ on:
     branches: [main, develop]
   schedule:
     - cron: '0 1 * * 3'  # Every Wednesday at 1:00 AM
-
 permissions:
   contents: write
   security-events: write
-
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -27,8 +24,31 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r backend/requirements.txt
-          pip install flake8 pre-commit coverage pytest pytest-django pytest-cov
-
+          pip install flake8 pre-commit coverage pytest pytest-django pytest-cov sourcery-cli
+  sourcery:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Sourcery
+        run: pip install sourcery-cli
+      - name: Run Sourcery
+        env:
+          SOURCERY_TOKEN: ${{ secrets.SOURCERY_TOKEN }}
+        run: |
+          sourcery login --token $SOURCERY_TOKEN
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }}
+            sourcery review --check --diff "git diff origin/${{ github.base_ref }}..HEAD" .
+          else
+            sourcery review --check .
+          fi
   code_quality:
     runs-on: ubuntu-latest
     needs: setup
@@ -48,7 +68,6 @@ jobs:
         run: flake8 .
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
-
   tests:
     runs-on: ubuntu-latest
     needs: setup
@@ -72,7 +91,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: coverage.xml
-
   codeql_analysis:
     runs-on: ubuntu-latest
     needs: setup
@@ -87,10 +105,9 @@ jobs:
         uses: github/codeql-action/autobuild@v2
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-
   deploy:
     runs-on: ubuntu-latest
-    needs: [tests, code_quality, codeql_analysis]
+    needs: [tests, code_quality, codeql_analysis, sourcery]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to Production
