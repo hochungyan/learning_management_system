@@ -26,3 +26,4 @@ repos:
     hooks:
     -   id: name-tests-test
         args: ['--django']
+        exclude: '^backend/tests/.*_test\.py$'
