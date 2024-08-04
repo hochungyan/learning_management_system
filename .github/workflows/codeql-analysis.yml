@@ -1,4 +1,5 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches: [main, develop]
@@ -6,9 +7,12 @@ on:
     branches: [main, develop]
   schedule:
     - cron: '0 1 * * 3'  # Every Wednesday at 1:00 AM
+
 permissions:
-  contents: write
+  actions: read
+  contents: read
   security-events: write
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -25,6 +29,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r backend/requirements.txt
           pip install flake8 pre-commit coverage pytest pytest-django pytest-cov sourcery-cli
+
   sourcery:
     runs-on: ubuntu-latest
     needs: setup
@@ -49,6 +54,7 @@ jobs:
           else
             sourcery review --check .
           fi
+
   code_quality:
     runs-on: ubuntu-latest
     needs: setup
@@ -68,6 +74,7 @@ jobs:
         run: flake8 .
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
+
   tests:
     runs-on: ubuntu-latest
     needs: setup
@@ -91,20 +98,32 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: coverage.xml
+
   codeql_analysis:
+    name: CodeQL Analysis
     runs-on: ubuntu-latest
-    needs: setup
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python' ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: python
+          languages: ${{ matrix.language }}
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
+
   deploy:
     runs-on: ubuntu-latest
     needs: [tests, code_quality, codeql_analysis, sourcery]
