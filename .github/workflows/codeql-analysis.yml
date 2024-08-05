@@ -92,6 +92,7 @@ jobs:
           pip install coverage pytest pytest-django pytest-cov
       - name: Run tests with coverage
         env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
           coverage run -m pytest
