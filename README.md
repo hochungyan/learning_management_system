@@ -86,4 +86,4 @@ This project is personal work and is not open for licensing or redistribution at
 
 * Hat tip to anyone whose code was used
 * Inspiration
-* etc
+* Have fun!
