@@ -1,10 +1,10 @@
 asgiref==3.7.2
 boto3==1.20.26
 botocore==1.23.54
-certifi==2023.11.17
+certifi==2024.7.4
 cffi==1.16.0
 charset-normalizer==3.3.2
-cryptography==42.0.0
+cryptography==42.0.8
 dj-database-url==2.1.0
 Django==4.2.14
 django-anymail==10.2
@@ -13,12 +13,12 @@ django-jazzmin==2.6.0
 django-storages==1.12.3
 django-ckeditor-5
 pillow==10.3.0
-djangorestframework==3.14.0
+djangorestframework==3.15.2
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.7
 environs==10.0.0
 gunicorn==22.0.0
-idna==3.6
+idna==3.7
 inflection==0.5.1
 jmespath==0.10.0
 marshmallow==3.20.1
@@ -30,7 +30,7 @@ python-dateutil==2.8.2
 python-dotenv==1.0.0
 pytz==2023.3.post1
 PyYAML==6.0.1
-requests==2.31.0
+requests==2.32.2
 s3transfer==0.5.2
 shortuuid==1.0.11
 six==1.16.0
@@ -39,7 +39,7 @@ stripe==7.9.0
 typing_extensions==4.9.0
 tzdata==2023.3
 uritemplate==4.1.1
-urllib3==1.26.18
+urllib3==1.26.19
 moviepy==1.0.3
 coverage
 pytest
@@ -47,3 +47,6 @@ pytest-django
 pytest-cov
 flake8
 pre-commit
+numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
