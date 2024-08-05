@@ -1,5 +1,7 @@
 [![codecov](https://codecov.io/gh/hochungyan/learning_management_system/branch/main/graph/badge.svg)](https://codecov.io/gh/hochungyan/learning_management_system)
 ![CodeQL and Coverage](https://github.com/hochungyan/learning_management_system/actions/workflows/codeql-analysis.yml/badge.svg)
+[![Known Vulnerabilities](https://snyk.io/test/github/hochungyan/learning_management_system/badge.svg)](https://snyk.io/test/github/hochungyan/learning_management_system)
+
 # Learning Management System
 
 This project is a comprehensive, advanced full-stack Learning Management System (LMS) built from scratch using Django for the backend and React for the frontend. The system is designed to provide essential features for both learners and instructors, facilitating a dynamic and interactive online learning experience.
@@ -34,8 +36,8 @@ This project is a comprehensive, advanced full-stack Learning Management System 
 * React
 
 ### Backend Setup
-1. Clone the repository: `git clone https://github.com/your-username/lms-django-react.git`
-2. Navigate to the backend directory: `cd lms-django-react/backend`
+1. Clone the repository: `git clone https://github.com/hochungyan/learning_management_system.git`
+2. Navigate to the backend directory: `cd learning_management_system/backend`
 3. Create a virtual environment: `python -m venv venv`
 4. Activate the virtual environment:
    * On Windows: `venv\Scripts\activate`
@@ -59,7 +61,7 @@ This project uses GitHub Actions for continuous integration and deployment. The 
 * **Setup**: Checkout code, set up Python environment, and install dependencies
 * **Code Quality**: Linting with `flake8`, pre-commit hooks, and Sourcery analysis
 * **Testing**: Running tests with `pytest` and generating coverage reports with `coverage.py`
-* **Security Analysis**: Using CodeQL to identify security vulnerabilities
+* **Security Analysis**: Using CodeQL and Snyk to identify security vulnerabilities
 * **Deployment**: Automated deployment to production on successful builds from the main branch
 
 The workflow runs on pushes to `main` and `develop` branches, pull requests to these branches, and every Wednesday at 1:00 AM.
