@@ -91,6 +91,8 @@ jobs:
           pip install -r backend/requirements.txt
           pip install coverage pytest pytest-django pytest-cov
       - name: Run tests with coverage
+        env:
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
           coverage run -m pytest
           coverage xml
@@ -98,6 +100,21 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: coverage.xml
+
+  snyk:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python-3.10@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG_ID: ${{ secrets.SNYK_ORG_ID }}
+        with:
+          command: test
+          args: "--org=${{ secrets.SNYK_ORG_ID }}"
 
   codeql_analysis:
     name: CodeQL Analysis
@@ -126,7 +143,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [tests, code_quality, codeql_analysis, sourcery]
+    needs: [tests, code_quality, codeql_analysis, sourcery, snyk]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to Production
