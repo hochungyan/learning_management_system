@@ -107,10 +107,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Set up Snyk
-        uses: snyk/actions/setup@v2
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/cli@v2
+        uses: snyk/actions/python-3.10@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG_ID: ${{ secrets.SNYK_ORG_ID }}
