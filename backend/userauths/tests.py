@@ -1,9 +1,12 @@
+import os
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from userauths.models import Profile
 
 User = get_user_model()
+password = os.getenv("TEST_PASSWORD")
 
 
 @pytest.mark.django_db
@@ -18,7 +21,7 @@ def test_user_creation_without_username():
         None
     """
     user = User.objects.create_user(
-        email="test@example.com", password="testpassword"
+        email="test@example.com", password=password
     )
     assert user.email == "test@example.com"
     assert user.username == "test"
@@ -40,7 +43,7 @@ def test_user_creation_with_username():
     """
     user = User.objects.create_user(
         email="test@example.com",
-        password="testpassword",
+        password=password,
         username="customuser",
     )
     assert user.email == "test@example.com"
@@ -63,7 +66,7 @@ def test_user_creation_with_all_fields():
     """
     user = User.objects.create_user(
         email="full@example.com",
-        password="testpassword",
+        password=password,
         username="fulluser",
         full_name="Full User",
     )
@@ -87,7 +90,7 @@ def test_profile_creation():
         None
     """
     user = User.objects.create_user(
-        email="profile@example.com", password="testpassword"
+        email="profile@example.com", password=password
     )
     assert hasattr(user, "profile")
     assert isinstance(user.profile, Profile)
@@ -108,7 +111,7 @@ def test_profile_str_method():
     """
     user = User.objects.create_user(
         email="profile_str@example.com",
-        password="testpassword",
+        password=password,
         full_name="Test User",
     )
     print(f"User full_name: {user.full_name}")
@@ -130,7 +133,7 @@ def test_profile_image_upload():
         None
     """
     user = User.objects.create_user(
-        email="image@example.com", password="testpassword"
+        email="image@example.com", password=password
     )
     image = SimpleUploadedFile(
         "test_image.jpg", b"file_content", content_type="image/jpeg"
@@ -152,7 +155,7 @@ def test_profile_str_method_without_full_name():
         None
     """
     user = User.objects.create_user(
-        email="profile_str_no_name@example.com", password="testpassword"
+        email="profile_str_no_name@example.com", password=password
     )
     print(f"User full_name: {user.full_name}")
     print(f"User username: {user.username}")
@@ -173,7 +176,7 @@ def test_profile_update():
         None
     """
     user = User.objects.create_user(
-        email="update@example.com", password="testpassword"
+        email="update@example.com", password=password
     )
     user.profile.full_name = "Updated Name"
     user.profile.country = "Test Country"
@@ -198,7 +201,7 @@ def test_profile_cascade_delete():
         None
     """
     user = User.objects.create_user(
-        email="delete@example.com", password="testpassword"
+        email="delete@example.com", password=password
     )
     profile_id = user.profile.id
     user.delete()
@@ -223,7 +226,7 @@ def test_user_creation_without_email():
     with pytest.raises(ValueError, match="The Email field must be set"):
         User.objects.create_user(
             email="",
-            password="testpassword",
+            password=password,
             username="noemail",
         )
 
@@ -234,7 +237,7 @@ def test_create_superuser():
     Test creating a superuser.
     """
     superuser = User.objects.create_superuser(
-        email="admin@example.com", password="adminpassword"
+        email="admin@example.com", password=password
     )
     # Check if the superuser is created correctly
     assert superuser.email == "admin@example.com"
@@ -247,7 +250,7 @@ def test_create_superuser():
     # Test creating a superuser with custom fields
     custom_superuser = User.objects.create_superuser(
         email="custom_admin@example.com",
-        password="adminpassword",
+        password=password,
         full_name="Custom Admin",
     )
     assert custom_superuser.email == "custom_admin@example.com"
@@ -259,14 +262,14 @@ def test_create_superuser():
     with pytest.raises(ValueError):
         User.objects.create_superuser(
             email="fail_admin@example.com",
-            password="adminpassword",
+            password=password,
             is_staff=False,
         )
 
     with pytest.raises(ValueError):
         User.objects.create_superuser(
             email="fail_admin@example.com",
-            password="adminpassword",
+            password=password,
             is_superuser=False,
         )
 
@@ -281,7 +284,7 @@ def test_create_superuser_setdefault_and_extra_fields():
     # and that extra fields are passed through
     superuser = User.objects.create_superuser(
         email="explicit@example.com",
-        password="password123",
+        password=password,
         is_staff=True,
         is_superuser=True,
         full_name="Explicit Superuser",
@@ -294,7 +297,7 @@ def test_create_superuser_setdefault_and_extra_fields():
     with pytest.raises(ValueError, match="Superuser must have is_staff=True."):
         User.objects.create_superuser(
             email="staff_false@example.com",
-            password="password123",
+            password=password,
             is_staff=False,
         )
     # Test that setting is_superuser to False raises an error
@@ -303,7 +306,7 @@ def test_create_superuser_setdefault_and_extra_fields():
     ):
         User.objects.create_superuser(
             email="staff_false@example.com",
-            password="password123",
+            password=password,
             is_superuser=False,
         )
 
@@ -325,7 +328,7 @@ def test_user_str_method():
     """
     User = get_user_model()
     user = User.objects.create_user(
-        email="test@example.com", password="password123"
+        email="test@example.com", password=password
     )
     assert str(user) == "test@example.com"
 
@@ -333,7 +336,7 @@ def test_user_str_method():
 @pytest.mark.django_db
 def test():
     user = User.objects.create_user(
-        email="test@test.com", username="customuser", password="testpassword"
+        email="test@test.com", username="customuser", password=password
     )
     assert user.full_name == "customuser"
 
@@ -355,7 +358,7 @@ def test_profile_full_name_update():
         None
     """
     user = User.objects.create_user(
-        username="testuser", email="test@example.com", password="testpassword"
+        username="testuser", email="test@example.com", password=password
     )
     user.refresh_from_db()
     # Get the associated profile
@@ -389,7 +392,7 @@ class TestUserProfileSignal:
         user = User.objects.create_user(
             username="newuser",
             email="newuser@example.com",
-            password="password123",
+            password=password,
             full_name="New User",
         )
 
@@ -417,7 +420,7 @@ class TestUserProfileSignal:
         user = User.objects.create_user(
             username="updateuser",
             email="updateuser@example.com",
-            password="password123",
+            password=password,
             full_name="Update User",
         )
 
@@ -449,7 +452,7 @@ class TestUserProfileSignal:
         user = User.objects.create_user(
             username="existinguser",
             email="existinguser@example.com",
-            password="password123",
+            password=password,
             full_name="Existing User",
         )
 
