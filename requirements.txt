@@ -8,3 +8,6 @@ pytest-django
 pytest-cov
 flake8
 pre-commit
+pillow==10.2.0
+django-ckeditor-5==0.2.13
+moviepy==1.0.3
