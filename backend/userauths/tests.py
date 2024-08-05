@@ -269,3 +269,200 @@ def test_create_superuser():
             password="adminpassword",
             is_superuser=False,
         )
+
+
+@pytest.mark.django_db
+def test_create_superuser_setdefault_and_extra_fields():
+    """
+    Test the setdefault behavior and extra fields in create_superuser method.
+    """
+    User = get_user_model()
+    # Test that explicitly setting is_staff and is_superuser to True works
+    # and that extra fields are passed through
+    superuser = User.objects.create_superuser(
+        email="explicit@example.com",
+        password="password123",
+        is_staff=True,
+        is_superuser=True,
+        full_name="Explicit Superuser",
+    )
+    assert superuser.is_staff
+    assert superuser.is_superuser
+    assert superuser.full_name == "Explicit Superuser"
+
+    # Test that setting is_staff to False raises an error
+    with pytest.raises(ValueError, match="Superuser must have is_staff=True."):
+        User.objects.create_superuser(
+            email="staff_false@example.com",
+            password="password123",
+            is_staff=False,
+        )
+    # Test that setting is_superuser to False raises an error
+    with pytest.raises(
+        ValueError, match="Superuser must have is_superuser=True."
+    ):
+        User.objects.create_superuser(
+            email="staff_false@example.com",
+            password="password123",
+            is_superuser=False,
+        )
+
+
+@pytest.mark.django_db
+def test_user_str_method():
+    """
+    Test the __str__ method of the User model.
+
+    This test creates a User instance with a specific email and password, then
+    checks if calling the __str__ method on the user object returns
+    the expected email.
+
+    Args:
+        self
+
+    Returns:
+        None
+    """
+    User = get_user_model()
+    user = User.objects.create_user(
+        email="test@example.com", password="password123"
+    )
+    assert str(user) == "test@example.com"
+
+
+@pytest.mark.django_db
+def test():
+    user = User.objects.create_user(
+        email="test@test.com", username="customuser", password="testpassword"
+    )
+    assert user.full_name == "customuser"
+
+
+@pytest.mark.django_db
+def test_profile_full_name_update():
+    """
+    Test the update of the full_name attribute in the Profile model.
+
+    This test creates a User instance, sets the full_name attribute
+    of the associated Profile to an empty string, saves the
+    profile triggering the save method,
+    and then checks if the full_name has been updated to the username.
+
+    Args:
+        self
+
+    Returns:
+        None
+    """
+    user = User.objects.create_user(
+        username="testuser", email="test@example.com", password="testpassword"
+    )
+    user.refresh_from_db()
+    # Get the associated profile
+    profile = user.profile
+    # Set the full_name to an empty string
+    profile.full_name = ""
+    # Save the profile, which should trigger the save method
+    profile.save()
+    # Refresh the profile from the database
+    profile.refresh_from_db()
+    # Assert that the full_name has been set to the username
+    assert profile.full_name == "testuser"
+
+
+@pytest.mark.django_db
+class TestUserProfileSignal:
+
+    def test_profile_created_on_user_creation(self):
+        """
+        Test the creation of a profile when a user is created.
+
+        This test creates a new user and checks if a profile
+        is created for the user with the correct full name.
+
+        Args:
+            self
+
+        Returns:
+            None
+        """
+        user = User.objects.create_user(
+            username="newuser",
+            email="newuser@example.com",
+            password="password123",
+            full_name="New User",
+        )
+
+        assert hasattr(user, "profile")
+        assert isinstance(user.profile, Profile)
+        assert user.profile.full_name == "New User"
+
+    def test_profile_updated_on_user_update(self):
+        """
+        Test the update of a profile when a user is updated.
+
+        This test creates a user, updates the user's
+        full name,saves the user, refreshes
+        the user from the database,
+        and then checks if the profile's full name
+        has been updated accordingly.
+
+        Args:
+            self
+
+        Returns:
+            None
+        """
+        # Create a user
+        user = User.objects.create_user(
+            username="updateuser",
+            email="updateuser@example.com",
+            password="password123",
+            full_name="Update User",
+        )
+
+        # Update the user's full name
+        user.full_name = "Updated User"
+        user.save()
+
+        # Refresh the user from the database
+        user.refresh_from_db()
+
+        # Check if the profile's full name was updated
+        assert user.profile.full_name == "Updated User"
+
+    def test_profile_not_created_if_exists(self):
+        """
+        Test the behavior when a profile is not created if it already exists.
+
+        This test creates a user, updates the user's full name, saves the user,
+        and then checks that no new profile is created and the existing
+        profile is updated accordingly.
+
+        Args:
+            self
+
+        Returns:
+            None
+        """
+        # Create a user
+        user = User.objects.create_user(
+            username="existinguser",
+            email="existinguser@example.com",
+            password="password123",
+            full_name="Existing User",
+        )
+
+        # Count the number of profiles
+        initial_profile_count = Profile.objects.count()
+
+        # Update the user
+        user.full_name = "Updated Existing User"
+        user.save()
+
+        # Check that no new profile was created
+        assert Profile.objects.count() == initial_profile_count
+
+        # Check that the existing profile was updated
+        user.refresh_from_db()
+        assert user.profile.full_name == "Updated Existing User"
