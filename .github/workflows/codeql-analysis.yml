@@ -108,9 +108,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Set up Snyk
-        uses: snyk/actions/setup@v1
+        uses: snyk/actions/setup@v2
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/cli@v1
+        uses: snyk/actions/cli@v2
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG_ID: ${{ secrets.SNYK_ORG_ID }}
