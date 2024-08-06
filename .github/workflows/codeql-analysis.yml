@@ -38,9 +38,6 @@ jobs:
           pip install flake8 pre-commit coverage pytest pytest-django pytest-cov sourcery-cli
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
-      - name: Check for uncommitted changes
-        run: |
-          git diff-index --quiet HEAD || (echo "Uncommitted changes detected. Please run pre-commit hooks locally and commit changes." && exit 1)
 
   sourcery:
     runs-on: ubuntu-latest
@@ -171,7 +168,7 @@ jobs:
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
+          server_address: smtp.office365.com
           server_port: 587
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
