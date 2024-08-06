@@ -1,4 +1,4 @@
-name: Enhanced CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -99,6 +99,7 @@ jobs:
           pip install coverage pytest pytest-django pytest-cov
       - name: Run tests with coverage
         env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
           coverage run -m pytest
@@ -156,3 +157,4 @@ jobs:
       - name: Deploy to Production
         run: echo "Deploying to production..."
         # Add your deployment steps here
+
