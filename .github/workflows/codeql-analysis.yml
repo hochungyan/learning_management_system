@@ -183,3 +183,5 @@ jobs:
             Committer: ${{ github.event.head_commit.committer.name }}
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.SMTP_USERNAME }}
+      - name: Debug email step
+        run: echo "Email notification sent to ${{ secrets.EMAIL_TO }} from ${{ secrets.SMTP_USERNAME }}"
