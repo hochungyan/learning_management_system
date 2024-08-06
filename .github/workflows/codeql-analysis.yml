@@ -1,4 +1,4 @@
-name: Enhanced CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -36,6 +36,11 @@ jobs:
           pip install -r requirements.txt
           pip install -r backend/requirements.txt
           pip install flake8 pre-commit coverage pytest pytest-django pytest-cov sourcery-cli
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files
+      - name: Check for uncommitted changes
+        run: |
+          git diff-index --quiet HEAD || (echo "Uncommitted changes detected. Please run pre-commit hooks locally and commit changes." && exit 1)
 
   sourcery:
     runs-on: ubuntu-latest
@@ -99,6 +104,7 @@ jobs:
           pip install coverage pytest pytest-django pytest-cov
       - name: Run tests with coverage
         env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
           coverage run -m pytest
@@ -156,3 +162,27 @@ jobs:
       - name: Deploy to Production
         run: echo "Deploying to production..."
         # Add your deployment steps here
+
+  notify:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [setup, sourcery, code_quality, tests, snyk, codeql_analysis, deploy]
+    steps:
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: GitHub Actions Job Notification
+          body: |
+            CI/CD Pipeline run for ${{ github.repository }}.
+            Job: ${{ github.workflow }}
+            Status: ${{ job.status }}
+            Branch: ${{ github.ref }}
+            Event: ${{ github.event_name }}
+            Commit Message: ${{ github.event.head_commit.message }}
+            Committer: ${{ github.event.head_commit.committer.name }}
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.SMTP_USERNAME }}
