@@ -168,7 +168,7 @@ jobs:
       - name: Get pipeline duration
         id: duration
         run: |
-          start_time=$(jq -r '.jobs[].steps[] | select(.name == "Checkout code") | .started_at' $GITHUB_EVENT_PATH)
+          start_time=${{ github.event.repository.pushed_at }}
           end_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           duration=$(( $(date -d "$end_time" +%s) - $(date -d "$start_time" +%s) ))
           echo "DURATION=$(printf '%dm%ds' $(($duration / 60)) $(($duration % 60)))" >> $GITHUB_OUTPUT
