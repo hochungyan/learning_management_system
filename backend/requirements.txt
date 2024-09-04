@@ -4,9 +4,9 @@ botocore==1.23.54
 certifi==2024.7.4
 cffi==1.16.0
 charset-normalizer==3.3.2
-cryptography==42.0.8
+cryptography==43.0.1
 dj-database-url==2.1.0
-django==4.2.15
+django==4.2.16
 django-anymail==10.2
 django-cors-headers==3.14.0
 django-jazzmin==2.6.0
